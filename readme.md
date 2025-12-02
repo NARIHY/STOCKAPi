@@ -183,5 +183,3 @@ Pour SQL Server distant :
 "ConnectionStrings": {
 "DefaultConnection": "Server=192.168.1.10;Database=StockDB;User Id=stock_user;Password=MotDePasseFort;Encrypt=True;TrustServerCertificate=True;"
 }
-
-```
