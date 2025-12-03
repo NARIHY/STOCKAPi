@@ -14,17 +14,46 @@ namespace StockAPI.Services
         }
 
         public async Task<IEnumerable<Product>> GetAllAsync()
-            => await _context.Products.Include(c => c.Category).ToListAsync();
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .AsNoTracking()
+                .ToListAsync();
+        }
 
         public async Task<Product?> GetByIdAsync(int id)
-            => await _context.Products.Include(c => c.Category)
-                                      .FirstOrDefaultAsync(x => x.Id == id);
+        {
+            return await _context.Products
+                .AsNoTracking() 
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
 
         public async Task<Product> CreateAsync(Product product)
         {
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
             return product;
+        }
+
+        public async Task UpdateAsync(Product product)
+        {
+            var existing = await _context.Products.FirstOrDefaultAsync(x => x.Id == product.Id);
+            if (existing == null) return;
+
+            // Copie proprement les valeurs
+            _context.Entry(existing).CurrentValues.SetValues(product);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var p = await _context.Products.FindAsync(id);
+            if (p != null)
+            {
+                _context.Products.Remove(p);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<Product> UpdateStockAsync(int productId)
@@ -43,3 +72,4 @@ namespace StockAPI.Services
         }
     }
 }
+

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StockAPI.Data;
 using StockAPI.Models;
+using StockAPI.Services;
 
 namespace StockAPI.Controllers
 {
@@ -9,24 +8,47 @@ namespace StockAPI.Controllers
     [Route("api/[controller]")]
     public class CategoriesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICategoryService _service;
 
-        public CategoriesController(AppDbContext context)
+        public CategoriesController(ICategoryService service)
         {
-            _context = context;
+            _service = service;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
-            => Ok(await _context.Categories.ToListAsync());
+            => Ok(await _service.GetAllAsync());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var category = await _service.GetByIdAsync(id);
+            if (category == null)
+                return NotFound();
+            return Ok(category);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create(Category category)
         {
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-            return Ok(category);
+            var created = await _service.CreateAsync(category);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, Category category)
+        {
+            var updated = await _service.UpdateAsync(id, category);
+            if (updated == null)
+                return NotFound();
+            return Ok(updated);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var deleted = await _service.DeleteAsync(id);
+            return deleted ? NoContent() : NotFound();
         }
     }
-
 }

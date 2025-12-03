@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using StockAPI.Data;
-using StockAPI.Models;
+﻿using StockAPI.Models;
 
 namespace StockAPI.Services
 {
@@ -9,7 +7,10 @@ namespace StockAPI.Services
         Task<IEnumerable<Product>> GetAllAsync();
         Task<Product?> GetByIdAsync(int id);
         Task<Product> CreateAsync(Product product);
+        Task UpdateAsync(Product product);
+        Task DeleteAsync(int id);
+
+        //PRODUCT 
         Task<Product> UpdateStockAsync(int productId);
     }
-
 }
